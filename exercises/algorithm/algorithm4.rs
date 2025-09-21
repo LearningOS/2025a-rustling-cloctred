@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -50,13 +49,44 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        match self.root {
+            None => self.root = Some(Box::new(TreeNode { value, left: None, right: None })),
+            Some(ref mut node) => Self::insert_recursive(node, value),
+        }
+    }
+    fn insert_recursive(node: &mut Box<TreeNode<T>>, value: T) {
+        if value < node.value {
+            match node.left {
+                None => node.left = Some(Box::new(TreeNode { value, left: None, right: None })),
+                Some(ref mut left_node) => Self::insert_recursive(left_node, value),
+            }
+        } else if value > node.value {
+            match node.right {
+                None => node.right = Some(Box::new(TreeNode { value, left: None, right: None })),
+                Some(ref mut right_node) => Self::insert_recursive(right_node, value),
+            }
+        }
+        // If value == node.value, we don't insert (no duplicates)
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        match self.root {
+            None => false,
+            Some(ref node) => Self::search_recursive(node, value),
+        }
+    }
+
+    fn search_recursive(node: &Box<TreeNode<T>>, value: T) -> bool {
+        if value == node.value {
+            true
+        } else if value < node.value {
+            node.left.as_ref().map(|left_node| Self::search_recursive(left_node, value))
+            .unwrap_or(false)
+        } else {
+            node.right.as_ref().map(|right_node| Self::search_recursive(right_node, value))
+            .unwrap_or(false)
+        }
     }
 }
 

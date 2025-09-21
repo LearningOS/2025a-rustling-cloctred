@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -70,13 +69,47 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+    where T: Ord + Clone + Copy
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut result = LinkedList::<T>::new();
+        if list_a.length == 0 {
+            result = list_b;
+        } else if list_b.length == 0 {
+            result = list_a;
+        } else {
+            let mut node_a = list_a.start;
+            let mut node_b = list_b.start;
+            while node_a.is_some() && node_b.is_some() {
+                match unsafe {
+                    (*node_a.unwrap_unchecked().as_ptr()).val.cmp(&(*node_b.unwrap_unchecked().as_ptr()).val)
+                } {
+                    std::cmp::Ordering::Less => {
+                        result.add(unsafe { (*node_a.unwrap_unchecked().as_ptr()).val });
+                        node_a = unsafe { (*node_a.unwrap_unchecked().as_ptr()).next };
+                    }
+                    std::cmp::Ordering::Greater => {
+                        result.add(unsafe { (*node_b.unwrap_unchecked().as_ptr()).val });
+                        node_b = unsafe { (*node_b.unwrap_unchecked().as_ptr()).next };
+                    }
+                    std::cmp::Ordering::Equal => {
+                        result.add(unsafe { (*node_a.unwrap_unchecked().as_ptr()).val });
+                        result.add(unsafe { (*node_b.unwrap_unchecked().as_ptr()).val });
+                        node_a = unsafe { (*node_a.unwrap_unchecked().as_ptr()).next };
+                        node_b = unsafe { (*node_b.unwrap_unchecked().as_ptr()).next };
+                    }
+                }
+            }
+            while node_a.is_some() {
+                result.add(unsafe { (*node_a.unwrap_unchecked().as_ptr()).val });
+                node_a = unsafe { (*node_a.unwrap_unchecked().as_ptr()).next };
+            }
+            while node_b.is_some() {
+                result.add(unsafe { (*node_b.unwrap_unchecked().as_ptr()).val });
+                node_b = unsafe { (*node_b.unwrap_unchecked().as_ptr()).next };
+            }
         }
+
+        result
 	}
 }
 
